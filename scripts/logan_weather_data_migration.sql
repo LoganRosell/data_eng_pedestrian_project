@@ -1,4 +1,15 @@
 
+--===============================================
+-- Create State Abberivation Lookup Table
+--===============================================
+
+--drop table states_lookup;
+--Add state abbriviations to cities table
+CREATE TABLE IF NOT EXISTS states_lookup (
+ abbr char(2),
+ state_name varchar(50)
+);
+
 BEGIN;
 
 INSERT INTO states_lookup VALUES
@@ -81,6 +92,9 @@ INSERT INTO states_lookup VALUES
 
 COMMIT;
 
+--==============================================
+-- Add state abbreviation column to cities table
+--==============================================
 
 SELECT *, sl.abbr AS state_abbr
   FROM cities c
@@ -149,8 +163,10 @@ WITH duplicates AS(
 
 
 
-
+--===================================================
 --Joinning vision zero cities with geo-code data
+--===================================================
+
 SELECT 
     g.name AS census_name, 
     c.city AS vision_zero_name,
@@ -186,6 +202,25 @@ SELECT
 FROM RankedMatches
 WHERE priority = 1;
 
+
+--============================
+-- create timezone table for each us city
+--============================
+drop table if exists us_city_timezones;
+
+CREATE TABLE us_city_timezones (
+  city varchar(100),
+  city_ascii varchar(100),
+  state_id varchar(2),
+  state_name varchar(100),
+  timezone text
+);
+
+-- \copy us_city_timezones
+--   FROM '/Users/loganrosell/Desktop/WU_Data_Eng/data_eng_project_files/us_city_timezones.csv'
+--   WITH (FORMAT CSV, HEADER);
+
+
 --============================
 -- Ingesting Weather Data
 --============================
@@ -215,6 +250,10 @@ CREATE TABLE IF NOT EXISTS weather_data_staging_table (
 SELECT COUNT(*)
   FROM weather_data_staging_table;
 
+--===========================================
+-- Ingesting Weather API location lookup Data
+--===========================================
+
 CREATE TABLE IF NOT EXISTS weather_data_location_lookup (
   location_id integer PRIMARY KEY,
   latitude numeric,
@@ -232,12 +271,6 @@ CREATE TABLE IF NOT EXISTS weather_data_location_lookup (
 SELECT COUNT(*)
   FROM weather_data_location_lookup;
 
---drop table states_lookup;
---Add state abbriviations to cities table
-CREATE TABLE IF NOT EXISTS states_lookup (
- abbr char(2),
- state_name varchar(50)
-);
 
 --===================================================
 -- Checking for data quality issues in weather data
@@ -290,29 +323,10 @@ SELECT
 
 
 
---============================
--- create timezone table for each us city
---============================
-drop table if exists us_city_timezones;
 
-CREATE TABLE us_city_timezones (
-  city varchar(100),
-  city_ascii varchar(100),
-  state_id varchar(2),
-  state_name varchar(100),
-  timezone text
-);
-
--- \copy us_city_timezones
---   FROM '/Users/loganrosell/Desktop/WU_Data_Eng/data_eng_project_files/us_city_timezones.csv'
---   WITH (FORMAT CSV, HEADER);
-
-
---============================
+--============================================================
 -- migrate weather data from staging table to nomralized table
---============================
-
-
+--============================================================
 
 CREATE EXTENSION IF NOT EXISTS postgis;
 
@@ -410,4 +424,12 @@ JOIN city_names_table cnt ON cnt.geoid = geo.geoid;
   
 
 COMMIT;
+
+--====================================
+-- Validating Normalizing Weather Data
+--====================================
+
+SELECT COUNT(*) FROM weather_conditions;
+SELECT COUNT(*) FROM weather_data_staging_table;
+
 
