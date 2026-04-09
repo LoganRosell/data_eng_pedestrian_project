@@ -1,4 +1,6 @@
 
+-- connect to railway database in terminal with the following command: psql postgresql://postgres:lupJXLSDiUiKBosiMsFNyPhjuWbkkdrk@turntable.proxy.rlwy.net:31000/railway
+
 --===============================================
 -- Create State Abberivation Lookup Table
 --===============================================
@@ -112,12 +114,24 @@ SELECT state, state_abbr
 FROM cities 
 WHERE state_abbr IS NULL;
 
+--==============================================
+-- Drop metro areas from cities table
+--==============================================
+
+DELETE FROM cities
+  WHERE city = 'Denver Regional Council of Governments' OR 
+    city = 'Oregon Metro' OR 
+    city = 'Montgomery County' OR 
+    city = 'Hillsborough County'
+
+
+
 --====================
 --Geocoding data
 --====================
 
 -- \copy us_geocodes 
--- FROM '/tmp/2025_Gaz_place_national.txt' 
+-- FROM '/Users/loganrosell/Desktop/WU_Data_Eng/data_eng_pedestrian_project/data_sources/2025_Gaz_place_national.txt' 
 -- WITH (FORMAT CSV, HEADER, DELIMITER '|');
 
 drop table us_geocodes;
@@ -137,6 +151,8 @@ CREATE TABLE us_geocodes (
   lat numeric,
   lon numeric
 );
+
+
 
 --===================================================
 --Inspecting Data Quality for us_geocode data
