@@ -377,6 +377,12 @@ FROM weather_data_location_lookup AS w
 -- Normalizing Weather Data
 --============================
 
+-- reset weather_conidtion table
+-- BEGIN;
+-- TRUNCATE TABLE weather_conditions CASCADE;
+-- COMMIT;
+
+
 BEGIN;
 
 WITH city_names_table AS (
@@ -448,4 +454,240 @@ COMMIT;
 SELECT COUNT(*) FROM weather_conditions;
 SELECT COUNT(*) FROM weather_data_staging_table;
 
+SELECT COUNT(*) FROM weather_data_staging_table WHERE location_id = 0;
+SELECT COUNT(*) FROM weather_data_staging_table GROUP BY location_id;
 
+SELECT COUNT(*) FROM weather_conditions GROUP BY city_id;
+
+
+-- WITH city_names_table AS (
+--   WITH RankedMatches AS (
+--       SELECT 
+--           c.city_id,
+--           c.city AS vision_zero_city_name,
+--           c.state,
+--           c.county,
+--           c.state_abbr,
+--           g.geoid,
+--           g.name AS geocode_city_name,
+--           g.lat AS geocode_lat,
+--           g.lon AS geocode_lon,
+--           ROW_NUMBER() OVER (
+--               PARTITION BY c.city, c.state_abbr 
+--               ORDER BY (CASE WHEN g.funcstat = 'A' THEN 1 ELSE 2 END) ASC
+--           ) as priority
+--       FROM cities c
+--       LEFT JOIN us_geocodes g
+--         ON (UPPER(g.name) LIKE UPPER(REPLACE(c.city, ' DC', '')) || '%')
+--           AND (g.usps = c.state_abbr)
+--   )
+--   SELECT *
+--   FROM RankedMatches
+--   WHERE priority = 1
+-- )
+-- SELECT 
+--     city_id,
+--     geocode_lat,
+--     geocode_lon
+--   FROM city_names_table;
+
+
+WITH condition_to_location_join AS (
+  SELECT 
+    wst.*,
+    wl.latitude,
+    wl.longitude,
+    wl.elevation
+  FROM weather_data_location_lookup AS wl
+  JOIN weather_data_staging_table wst ON wst.location_id = wl.location_id
+)
+SELECT COUNT(*)
+  FROM condition_to_location_join
+  GROUP BY location_id;
+  
+
+--====================================
+-- creating lat_lon_city_lookup_table
+--====================================
+
+-- DROP TABLE lat_lon_city_lookup;
+
+CREATE TABLE IF NOT EXISTS lat_lon_city_lookup (
+ geocode_lat numeric,
+ geocode_lon numeric,
+  weather_lat numeric,
+  weather_lon numeric,
+  city_id integer,
+  location_id integer
+);
+
+-- add city IDs to table
+BEGIN;
+INSERT INTO lat_lon_city_lookup(city_id)
+  SELECT city_id
+  FROM cities;
+COMMIT;
+
+-- add geocode_lat and geocode_lon to table
+-- BEGIN;
+
+-- WITH city_names_table AS (
+--   WITH RankedMatches AS (
+--       SELECT 
+--           c.city_id,
+--           c.city AS vision_zero_city_name,
+--           c.state,
+--           c.county,
+--           c.state_abbr,
+--           g.geoid,
+--           g.name AS geocode_city_name,
+--           g.lat AS geocode_lat,
+--           g.lon AS geocode_lon,
+--           ROW_NUMBER() OVER (
+--               PARTITION BY c.city, c.state_abbr 
+--               ORDER BY (CASE WHEN g.funcstat = 'A' THEN 1 ELSE 2 END) ASC
+--           ) as priority
+--       FROM cities c
+--       LEFT JOIN us_geocodes g
+--         ON (UPPER(g.name) LIKE UPPER(REPLACE(c.city, ' DC', '')) || '%')
+--           AND (g.usps = c.state_abbr)
+--   )
+--   SELECT *
+--   FROM RankedMatches
+--   WHERE priority = 1
+-- )
+-- UPDATE lat_lon_city_lookup AS llcl
+-- SET 
+--     geocode_lat = cn.geocode_lat,
+--     geocode_lon = cn.geocode_lon
+-- FROM city_names_table AS cn
+-- WHERE llcl.city_id = cn.city_id;
+  
+-- COMMIT;
+
+
+-- Add weather station lat/lon and location id to table
+-- BEGIN;
+
+-- WITH weather_coords_to_geocode_coords AS(
+--   SELECT 
+--     w.location_id,
+--     w.latitude AS weather_lat,
+--     w.longitude AS weather_lon,
+--     geo.lat AS geocode_lat,
+--     geo.lon AS geocode_lon
+-- FROM weather_data_location_lookup AS w
+--   CROSS JOIN LATERAL (
+--       SELECT 
+--           name, 
+--           usps, 
+--           lat, 
+--           lon
+--       FROM us_geocodes g
+--       ORDER BY 
+--           ST_SetSRID(ST_MakePoint(lon::double precision, lat::double precision), 4326) <-> 
+--           ST_SetSRID(ST_MakePoint(w.longitude::double precision, w.latitude::double precision), 4326)
+--       LIMIT 1
+--   ) AS geo
+-- )
+-- UPDATE lat_lon_city_lookup AS llcl
+-- SET 
+--     weather_lat = wctgc.weather_lat,
+--     weather_lon = wctgc.weather_lon,
+--     location_id = wctgc.location_id
+-- FROM weather_coords_to_geocode_coords AS wctgc
+-- WHERE 
+--   llcl.geocode_lat = wctgc.geocode_lat AND 
+--   llcl.geocode_lon = wctgc.geocode_lon;
+
+-- COMMIT;
+
+
+
+
+
+
+
+
+-- WITH weather_coords_to_geocode_coords AS(
+--   SELECT 
+--     w.location_id,
+--     w.latitude AS weather_lat,
+--     w.longitude AS weather_lon,
+--     geo.lat AS geocode_lat,
+--     geo.lon AS geocode_lon
+-- FROM weather_data_location_lookup AS w
+--   CROSS JOIN LATERAL (
+--       SELECT 
+--           name, 
+--           usps, 
+--           lat, 
+--           lon
+--       FROM us_geocodes g
+--       ORDER BY 
+--           ST_SetSRID(ST_MakePoint(lon::double precision, lat::double precision), 4326) <-> 
+--           ST_SetSRID(ST_MakePoint(w.longitude::double precision, w.latitude::double precision), 4326)
+--       LIMIT 1
+--   ) AS geo
+-- )
+-- SELECT * FROM weather_coords_to_geocode_coords
+
+BEGIN;
+
+WITH weather_geocode_unified AS (
+  WITH city_names_table AS (
+  WITH RankedMatches AS (
+      SELECT 
+          c.city_id,
+          c.city AS vision_zero_city_name,
+          c.state,
+          c.county,
+          c.state_abbr,
+          g.geoid,
+          g.name AS geocode_city_name,
+          g.lat AS geocode_lat,
+          g.lon AS geocode_lon,
+          ROW_NUMBER() OVER (
+              PARTITION BY c.city, c.state_abbr 
+              ORDER BY (CASE WHEN g.funcstat = 'A' THEN 1 ELSE 2 END) ASC
+          ) as priority
+      FROM cities c
+      LEFT JOIN us_geocodes g
+        ON (UPPER(g.name) LIKE UPPER(REPLACE(c.city, ' DC', '')) || '%')
+          AND (g.usps = c.state_abbr)
+  )
+  SELECT *
+  FROM RankedMatches
+  WHERE priority = 1
+)
+SELECT 
+    cnt.city_id,
+    cnt.vision_zero_city_name,
+    cnt.geocode_city_name,
+    cnt.geocode_lat,
+    cnt.geocode_lon,
+    weather_loc.location_id,
+    weather_loc.latitude AS weather_lat,
+    weather_loc.longitude AS weather_lon
+FROM city_names_table AS cnt
+CROSS JOIN LATERAL (
+      SELECT 
+          *
+      FROM weather_data_location_lookup wll
+      ORDER BY 
+          ST_SetSRID(ST_MakePoint(cnt.geocode_lon::double precision, cnt.geocode_lat::double precision), 4326) <-> 
+          ST_SetSRID(ST_MakePoint(wll.longitude::double precision, wll.latitude::double precision), 4326)
+      LIMIT 1
+  ) AS weather_loc
+)
+UPDATE lat_lon_city_lookup AS llcl
+SET 
+    geocode_lat = wgu.geocode_lat,
+    geocode_lon = wgu.geocode_lon,
+    weather_lat = wgu.weather_lat,
+    weather_lon = wgu.weather_lon,
+    location_id = wgu.location_id
+FROM weather_geocode_unified AS wgu
+WHERE llcl.city_id = wgu.city_id;
+
+COMMIT;
