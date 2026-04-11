@@ -1,4 +1,4 @@
-
+-- Author: Logan Rosell
 -- connect to railway database in terminal with the following command: psql postgresql://postgres:lupJXLSDiUiKBosiMsFNyPhjuWbkkdrk@turntable.proxy.rlwy.net:31000/railway
 
 --===============================================
@@ -528,109 +528,7 @@ INSERT INTO lat_lon_city_lookup(city_id)
   FROM cities;
 COMMIT;
 
--- add geocode_lat and geocode_lon to table
--- BEGIN;
-
--- WITH city_names_table AS (
---   WITH RankedMatches AS (
---       SELECT 
---           c.city_id,
---           c.city AS vision_zero_city_name,
---           c.state,
---           c.county,
---           c.state_abbr,
---           g.geoid,
---           g.name AS geocode_city_name,
---           g.lat AS geocode_lat,
---           g.lon AS geocode_lon,
---           ROW_NUMBER() OVER (
---               PARTITION BY c.city, c.state_abbr 
---               ORDER BY (CASE WHEN g.funcstat = 'A' THEN 1 ELSE 2 END) ASC
---           ) as priority
---       FROM cities c
---       LEFT JOIN us_geocodes g
---         ON (UPPER(g.name) LIKE UPPER(REPLACE(c.city, ' DC', '')) || '%')
---           AND (g.usps = c.state_abbr)
---   )
---   SELECT *
---   FROM RankedMatches
---   WHERE priority = 1
--- )
--- UPDATE lat_lon_city_lookup AS llcl
--- SET 
---     geocode_lat = cn.geocode_lat,
---     geocode_lon = cn.geocode_lon
--- FROM city_names_table AS cn
--- WHERE llcl.city_id = cn.city_id;
-  
--- COMMIT;
-
-
--- Add weather station lat/lon and location id to table
--- BEGIN;
-
--- WITH weather_coords_to_geocode_coords AS(
---   SELECT 
---     w.location_id,
---     w.latitude AS weather_lat,
---     w.longitude AS weather_lon,
---     geo.lat AS geocode_lat,
---     geo.lon AS geocode_lon
--- FROM weather_data_location_lookup AS w
---   CROSS JOIN LATERAL (
---       SELECT 
---           name, 
---           usps, 
---           lat, 
---           lon
---       FROM us_geocodes g
---       ORDER BY 
---           ST_SetSRID(ST_MakePoint(lon::double precision, lat::double precision), 4326) <-> 
---           ST_SetSRID(ST_MakePoint(w.longitude::double precision, w.latitude::double precision), 4326)
---       LIMIT 1
---   ) AS geo
--- )
--- UPDATE lat_lon_city_lookup AS llcl
--- SET 
---     weather_lat = wctgc.weather_lat,
---     weather_lon = wctgc.weather_lon,
---     location_id = wctgc.location_id
--- FROM weather_coords_to_geocode_coords AS wctgc
--- WHERE 
---   llcl.geocode_lat = wctgc.geocode_lat AND 
---   llcl.geocode_lon = wctgc.geocode_lon;
-
--- COMMIT;
-
-
-
-
-
-
-
-
--- WITH weather_coords_to_geocode_coords AS(
---   SELECT 
---     w.location_id,
---     w.latitude AS weather_lat,
---     w.longitude AS weather_lon,
---     geo.lat AS geocode_lat,
---     geo.lon AS geocode_lon
--- FROM weather_data_location_lookup AS w
---   CROSS JOIN LATERAL (
---       SELECT 
---           name, 
---           usps, 
---           lat, 
---           lon
---       FROM us_geocodes g
---       ORDER BY 
---           ST_SetSRID(ST_MakePoint(lon::double precision, lat::double precision), 4326) <-> 
---           ST_SetSRID(ST_MakePoint(w.longitude::double precision, w.latitude::double precision), 4326)
---       LIMIT 1
---   ) AS geo
--- )
--- SELECT * FROM weather_coords_to_geocode_coords
+-- add geocode lon/lat, weather station lon/lat, and location_id to lat_lon_city_lookup
 
 BEGIN;
 
@@ -691,3 +589,29 @@ FROM weather_geocode_unified AS wgu
 WHERE llcl.city_id = wgu.city_id;
 
 COMMIT;
+
+--================================================
+-- Add elevation values (in feet) to cities table
+--================================================
+
+BEGIN;
+
+UPDATE cities AS c 
+  SET elevation = wdll.elevation * 3.28084
+  FROM lat_lon_city_lookup AS llcl 
+  JOIN weather_data_location_lookup AS wdll ON llcl.location_id = wdll.location_id
+  WHERE c.city_id = llcl.city_id
+
+COMMIT;
+
+--================================================
+-- Drop lon and lat columns from cities table
+--================================================
+ALTER TABLE cities 
+DROP COLUMN IF EXISTS longitude,
+DROP COLUMN IF EXISTS latitude;
+
+
+
+
+
