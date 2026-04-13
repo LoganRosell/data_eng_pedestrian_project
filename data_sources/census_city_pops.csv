@@ -1,0 +1,63 @@
+census_id,census_city,census_pop,census_state_id,census_place_id
+1,"Anchorage municipality, Alaska",289600,02,03000
+2,"Tempe city, Arizona",190113,04,73000
+3,"Alameda city, California",78807,06,00562
+4,"Berkeley city, California",121730,06,06000
+5,"Fremont city, California",228191,06,26000
+6,"Los Angeles city, California",3878718,06,44000
+7,"Sacramento city, California",535787,06,64000
+8,"San Diego city, California",1404461,06,66000
+9,"San Francisco city, California",827526,06,67000
+10,"San Jose city, California",997395,06,68000
+11,"Santa Barbara city, California",87291,06,69070
+12,"Santa Rosa city, California",177531,06,70098
+13,"Vista city, California",99330,06,82996
+14,"Boulder city, Colorado",106802,08,07850
+15,"Denver city, Colorado",729019,08,20000
+16,"Stamford city, Connecticut",139112,09,73000
+17,"Washington city, District of Columbia",702250,11,50000
+18,"Deerfield Beach city, Florida",90487,12,16725
+19,"Fort Lauderdale city, Florida",190640,12,24000
+20,"Gainesville city, Florida",148716,12,25175
+21,"Orlando city, Florida",334871,12,53000
+22,"Tampa city, Florida",414575,12,71000
+23,"West Palm Beach city, Florida",127733,12,76600
+24,"Atlanta city, Georgia",520066,13,04000
+25,"Savannah city, Georgia",148809,13,69000
+26,"Chicago city, Illinois",2721326,17,14000
+27,"Louisville/Jefferson County metro government (balance), Kentucky",640793,21,48006
+28,"Boston city, Massachusetts",673822,25,07000
+29,"Cambridge city, Massachusetts",121203,25,11000
+30,"Somerville city, Massachusetts",82144,25,62535
+31,"Ann Arbor city, Michigan",122914,26,03000
+32,"Minneapolis city, Minnesota",428572,27,43000
+33,"Columbia city, Missouri",130913,29,15670
+34,"Kansas City city, Missouri",516045,29,38000
+35,"Omaha city, Nebraska",489263,31,37000
+36,"Las Vegas city, Nevada",678924,32,40000
+37,"Jersey City city, New Jersey",302822,34,36000
+38,"Albuquerque city, New Mexico",560333,35,02000
+39,"New York city, New York",8478072,36,51000
+40,"Apex town, North Carolina",75950,37,01520
+41,"Charlotte city, North Carolina",943474,37,12000
+42,"Durham city, North Carolina",301877,37,19000
+43,"Columbus city, Ohio",931551,39,18000
+44,"Toledo city, Ohio",265651,39,77000
+45,"Oklahoma City city, Oklahoma",713014,40,55000
+46,"Eugene city, Oregon",178789,41,23850
+47,"Portland city, Oregon",636958,41,59000
+48,"Bethlehem city, Pennsylvania",79959,42,06088
+49,"Philadelphia city, Pennsylvania",1573916,42,60000
+50,"Knoxville city, Tennessee",198708,47,40000
+51,"Austin city, Texas",993771,48,05000
+52,"El Paso city, Texas",681724,48,24000
+53,"Houston city, Texas",2387910,48,35000
+54,"San Antonio city, Texas",1526621,48,65000
+55,"Alexandria city, Virginia",159102,51,01000
+56,"Arlington CDP, Virginia",239807,51,03000
+57,"Richmond city, Virginia",233655,51,67000
+58,"Bellevue city, Washington",154387,53,05210
+59,"Seattle city, Washington",780992,53,63000
+60,"Tacoma city, Washington",228187,53,70000
+61,"Madison city, Wisconsin",285318,55,48000
+62,"Milwaukee city, Wisconsin",563512,55,53000

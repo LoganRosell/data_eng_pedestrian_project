@@ -1,3 +1,16 @@
+-- Author: Logan Rosell
+-- connect to railway database in terminal with the following command: psql postgresql://postgres:lupJXLSDiUiKBosiMsFNyPhjuWbkkdrk@turntable.proxy.rlwy.net:31000/railway
+
+--===============================================
+-- Create State Abberivation Lookup Table
+--===============================================
+
+--drop table states_lookup;
+--Add state abbriviations to cities table
+CREATE TABLE IF NOT EXISTS states_lookup (
+ abbr char(2),
+ state_name varchar(50)
+);
 
 BEGIN;
 
@@ -81,6 +94,9 @@ INSERT INTO states_lookup VALUES
 
 COMMIT;
 
+--==============================================
+-- Add state abbreviation column to cities table
+--==============================================
 
 SELECT *, sl.abbr AS state_abbr
   FROM cities c
@@ -98,12 +114,24 @@ SELECT state, state_abbr
 FROM cities 
 WHERE state_abbr IS NULL;
 
+--==============================================
+-- Drop metro areas from cities table
+--==============================================
+
+DELETE FROM cities
+  WHERE city = 'Denver Regional Council of Governments' OR 
+    city = 'Oregon Metro' OR 
+    city = 'Montgomery County' OR 
+    city = 'Hillsborough County'
+
+
+
 --====================
 --Geocoding data
 --====================
 
 -- \copy us_geocodes 
--- FROM '/tmp/2025_Gaz_place_national.txt' 
+-- FROM '/Users/loganrosell/Desktop/WU_Data_Eng/data_eng_pedestrian_project/data_sources/2025_Gaz_place_national.txt' 
 -- WITH (FORMAT CSV, HEADER, DELIMITER '|');
 
 drop table us_geocodes;
@@ -123,6 +151,8 @@ CREATE TABLE us_geocodes (
   lat numeric,
   lon numeric
 );
+
+
 
 --===================================================
 --Inspecting Data Quality for us_geocode data
@@ -149,8 +179,10 @@ WITH duplicates AS(
 
 
 
-
+--===================================================
 --Joinning vision zero cities with geo-code data
+--===================================================
+
 SELECT 
     g.name AS census_name, 
     c.city AS vision_zero_name,
@@ -186,6 +218,25 @@ SELECT
 FROM RankedMatches
 WHERE priority = 1;
 
+
+--============================
+-- create timezone table for each us city
+--============================
+drop table if exists us_city_timezones;
+
+CREATE TABLE us_city_timezones (
+  city varchar(100),
+  city_ascii varchar(100),
+  state_id varchar(2),
+  state_name varchar(100),
+  timezone text
+);
+
+-- \copy us_city_timezones
+--   FROM '/Users/loganrosell/Desktop/WU_Data_Eng/data_eng_project_files/us_city_timezones.csv'
+--   WITH (FORMAT CSV, HEADER);
+
+
 --============================
 -- Ingesting Weather Data
 --============================
@@ -215,6 +266,10 @@ CREATE TABLE IF NOT EXISTS weather_data_staging_table (
 SELECT COUNT(*)
   FROM weather_data_staging_table;
 
+--===========================================
+-- Ingesting Weather API location lookup Data
+--===========================================
+
 CREATE TABLE IF NOT EXISTS weather_data_location_lookup (
   location_id integer PRIMARY KEY,
   latitude numeric,
@@ -232,12 +287,6 @@ CREATE TABLE IF NOT EXISTS weather_data_location_lookup (
 SELECT COUNT(*)
   FROM weather_data_location_lookup;
 
---drop table states_lookup;
---Add state abbriviations to cities table
-CREATE TABLE IF NOT EXISTS states_lookup (
- abbr char(2),
- state_name varchar(50)
-);
 
 --===================================================
 -- Checking for data quality issues in weather data
@@ -290,29 +339,10 @@ SELECT
 
 
 
---============================
--- create timezone table for each us city
---============================
-drop table if exists us_city_timezones;
 
-CREATE TABLE us_city_timezones (
-  city varchar(100),
-  city_ascii varchar(100),
-  state_id varchar(2),
-  state_name varchar(100),
-  timezone text
-);
-
--- \copy us_city_timezones
---   FROM '/Users/loganrosell/Desktop/WU_Data_Eng/data_eng_project_files/us_city_timezones.csv'
---   WITH (FORMAT CSV, HEADER);
-
-
---============================
+--============================================================
 -- migrate weather data from staging table to nomralized table
---============================
-
-
+--============================================================
 
 CREATE EXTENSION IF NOT EXISTS postgis;
 
@@ -346,6 +376,12 @@ FROM weather_data_location_lookup AS w
 --============================
 -- Normalizing Weather Data
 --============================
+
+-- reset weather_conidtion table
+-- BEGIN;
+-- TRUNCATE TABLE weather_conditions CASCADE;
+-- COMMIT;
+
 
 BEGIN;
 
@@ -410,4 +446,172 @@ JOIN city_names_table cnt ON cnt.geoid = geo.geoid;
   
 
 COMMIT;
+
+--====================================
+-- Validating Normalizing Weather Data
+--====================================
+
+SELECT COUNT(*) FROM weather_conditions;
+SELECT COUNT(*) FROM weather_data_staging_table;
+
+SELECT COUNT(*) FROM weather_data_staging_table WHERE location_id = 0;
+SELECT COUNT(*) FROM weather_data_staging_table GROUP BY location_id;
+
+SELECT COUNT(*) FROM weather_conditions GROUP BY city_id;
+
+
+-- WITH city_names_table AS (
+--   WITH RankedMatches AS (
+--       SELECT 
+--           c.city_id,
+--           c.city AS vision_zero_city_name,
+--           c.state,
+--           c.county,
+--           c.state_abbr,
+--           g.geoid,
+--           g.name AS geocode_city_name,
+--           g.lat AS geocode_lat,
+--           g.lon AS geocode_lon,
+--           ROW_NUMBER() OVER (
+--               PARTITION BY c.city, c.state_abbr 
+--               ORDER BY (CASE WHEN g.funcstat = 'A' THEN 1 ELSE 2 END) ASC
+--           ) as priority
+--       FROM cities c
+--       LEFT JOIN us_geocodes g
+--         ON (UPPER(g.name) LIKE UPPER(REPLACE(c.city, ' DC', '')) || '%')
+--           AND (g.usps = c.state_abbr)
+--   )
+--   SELECT *
+--   FROM RankedMatches
+--   WHERE priority = 1
+-- )
+-- SELECT 
+--     city_id,
+--     geocode_lat,
+--     geocode_lon
+--   FROM city_names_table;
+
+
+WITH condition_to_location_join AS (
+  SELECT 
+    wst.*,
+    wl.latitude,
+    wl.longitude,
+    wl.elevation
+  FROM weather_data_location_lookup AS wl
+  JOIN weather_data_staging_table wst ON wst.location_id = wl.location_id
+)
+SELECT COUNT(*)
+  FROM condition_to_location_join
+  GROUP BY location_id;
+  
+
+--====================================
+-- creating lat_lon_city_lookup_table
+--====================================
+
+-- DROP TABLE lat_lon_city_lookup;
+
+CREATE TABLE IF NOT EXISTS lat_lon_city_lookup (
+ geocode_lat numeric,
+ geocode_lon numeric,
+  weather_lat numeric,
+  weather_lon numeric,
+  city_id integer,
+  location_id integer
+);
+
+-- add city IDs to table
+BEGIN;
+INSERT INTO lat_lon_city_lookup(city_id)
+  SELECT city_id
+  FROM cities;
+COMMIT;
+
+-- add geocode lon/lat, weather station lon/lat, and location_id to lat_lon_city_lookup
+
+BEGIN;
+
+WITH weather_geocode_unified AS (
+  WITH city_names_table AS (
+  WITH RankedMatches AS (
+      SELECT 
+          c.city_id,
+          c.city AS vision_zero_city_name,
+          c.state,
+          c.county,
+          c.state_abbr,
+          g.geoid,
+          g.name AS geocode_city_name,
+          g.lat AS geocode_lat,
+          g.lon AS geocode_lon,
+          ROW_NUMBER() OVER (
+              PARTITION BY c.city, c.state_abbr 
+              ORDER BY (CASE WHEN g.funcstat = 'A' THEN 1 ELSE 2 END) ASC
+          ) as priority
+      FROM cities c
+      LEFT JOIN us_geocodes g
+        ON (UPPER(g.name) LIKE UPPER(REPLACE(c.city, ' DC', '')) || '%')
+          AND (g.usps = c.state_abbr)
+  )
+  SELECT *
+  FROM RankedMatches
+  WHERE priority = 1
+)
+SELECT 
+    cnt.city_id,
+    cnt.vision_zero_city_name,
+    cnt.geocode_city_name,
+    cnt.geocode_lat,
+    cnt.geocode_lon,
+    weather_loc.location_id,
+    weather_loc.latitude AS weather_lat,
+    weather_loc.longitude AS weather_lon
+FROM city_names_table AS cnt
+CROSS JOIN LATERAL (
+      SELECT 
+          *
+      FROM weather_data_location_lookup wll
+      ORDER BY 
+          ST_SetSRID(ST_MakePoint(cnt.geocode_lon::double precision, cnt.geocode_lat::double precision), 4326) <-> 
+          ST_SetSRID(ST_MakePoint(wll.longitude::double precision, wll.latitude::double precision), 4326)
+      LIMIT 1
+  ) AS weather_loc
+)
+UPDATE lat_lon_city_lookup AS llcl
+SET 
+    geocode_lat = wgu.geocode_lat,
+    geocode_lon = wgu.geocode_lon,
+    weather_lat = wgu.weather_lat,
+    weather_lon = wgu.weather_lon,
+    location_id = wgu.location_id
+FROM weather_geocode_unified AS wgu
+WHERE llcl.city_id = wgu.city_id;
+
+COMMIT;
+
+--================================================
+-- Add elevation values (in feet) to cities table
+--================================================
+
+BEGIN;
+
+UPDATE cities AS c 
+  SET elevation = wdll.elevation * 3.28084
+  FROM lat_lon_city_lookup AS llcl 
+  JOIN weather_data_location_lookup AS wdll ON llcl.location_id = wdll.location_id
+  WHERE c.city_id = llcl.city_id
+
+COMMIT;
+
+--================================================
+-- Drop lon and lat columns from cities table
+--================================================
+ALTER TABLE cities 
+DROP COLUMN IF EXISTS longitude,
+DROP COLUMN IF EXISTS latitude;
+
+
+
+
 

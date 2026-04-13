@@ -1,0 +1,76 @@
+#,State,County,City,Vizion Zero Join Year,FIPS State ID,FIPS Place,FARS State ID
+4,Alaska,Anchorage,Anchorage,2018,2,3000,2
+73,Arizona,Maricopa,Tempe,2019,4,73000,4
+26,California,Alameda,Fremont,2016,6,26000,6
+37,California,San Diego,La Mesa,NULL,6,39682,6
+41,California,Los Angeles,Los Angeles,2017,6,44000,6
+47,California,Monterey,Monterey,2017,6,48872,6
+62,California,San Francisco,San Francisco,2014,6,67000,6
+64,California,San Luis Obispo,San Luis Obispo,NULL,6,68154,6
+66,California,Sonoma,Santa Rosa,NULL,6,70098,6
+75,California,San Diego,Vista,NULL,6,82996,6
+77,California,Santa Cruz,Watsonville,NULL,6,83668,6
+78,California,Los Angeles,West Hollywood,NULL,6,84410,6
+1,California,Alameda,Alameda,2021,6,562,6
+11,California,Alameda,Berkeley,2019,6,6000,6
+58,California,Sacramento,Sacramento,2018,6,64000,6
+61,California,San Diego,San Diego,2020,6,66000,6
+63,California,Santa Clara,San Jose,2020,6,68000,6
+65,California,Santa Barbara,Santa Barbara,2018,6,69070,6
+20,Colorado,Denver,Denver,2017,8,20000,8
+14,Colorado,Boulder,Boulder,2019,8,7850,8
+69,Connecticut,Fairfield,Stamford,NULL,9,73000,9
+76,Washington DC,Washington DC,Washington DC,2015,11,50000,11
+21,Florida,Broward,Deerfield Beach,NULL,12,16725,12
+28,Florida,Alachua,Gainesville,NULL,12,25175,12
+27,Florida,Broward,Fort Lauderdale,2018,12,24000,12
+54,Florida,Orange,Orlando,2021,12,53000,12
+72,Florida,Hillsborough,Tampa,2021,12,71000,12
+79,Florida,Palm Beach,West Palm Beach,2019,12,76600,12
+67,Georgia,Chatham,Savannah,NULL,13,69000,13
+8,Georgia,Fulton,Atlanta,2020,13,4000,13
+43,Georgia,Bibb,Macon,2020,13,49000,13
+17,Illinois,Cook,Chicago,2017,17,14000,17
+50,Illinois,Cook,Oak Park,NULL,17,54885,17
+42,Kentucky,Jefferson,Louisville,NULL,21,48006,21
+59,Maryland,Wicomico,Salisbury,NULL,24,69925,24
+15,Massachusetts,Middlesex,Cambridge,2017,25,11000,25
+13,Massachusetts,Suffolk,Boston,2018,25,7000,25
+70,Massachusetts,Middlesex,Somerville,2020,25,62535,25
+5,Michigan,Washtenaw,Ann Arbor,2021,26,3000,26
+46,Minnesota,Hennepin,Minneapolis,2020,27,43000,27
+18,Missouri,Boone,Columbia,2017,29,15670,29
+34,Missouri,Jackson,Kansas City,NULL,29,38000,29
+35,Missouri,St. Louis,Kirkwood,NULL,29,39044,29
+52,Nebraska,Douglas,Omaha,NULL,31,37000,31
+40,Nevada,Clark,Las Vegas,NULL,32,40000,32
+31,New Jersey,Hudson,Hoboken,2021,34,33250,34
+33,New Jersey,Hudson,Jersey City,2019,34,36000,34
+2,New Mexico,Bernalillo,Albuquerque,2021,35,2000,35
+49,New York,New York,New York City,2014,36,51000,36
+6,North Carolina,Wake,Apex,NULL,37,1520,37
+16,North Carolina,Mecklenburg,Charlotte,2019,37,12000,37
+23,North Carolina,Durham,Durham,2019,37,19000,37
+74,Ohio,Lucas,Toledo,NULL,39,77000,39
+19,Ohio,Franklin,Columbus,2020,39,18000,39
+51,Oklahoma,Oklahoma,Oklahoma City,NULL,40,55000,40
+56,Oregon,Multnomah,Portland,2016,41,59000,41
+24,Oregon,Lane,Eugene,2018,41,23850,41
+12,Pennsylvania,Northampton,Bethlehem,NULL,42,6088,42
+38,Pennsylvania,Lancaster,Lancaster,NULL,42,41216,42
+55,Pennsylvania,Philadelphia,Philadelphia,2017,42,60000,42
+29,Pennsylvania,Dauphin,Harrisburg,2019,42,32800,42
+36,Tennessee,Knox,Knoxville,NULL,47,40000,47
+9,Texas,Travis,Austin,2016,48,5000,48
+25,Texas,El Paso,El Paso,NULL,48,24000,48
+39,Texas,Webb,Laredo,NULL,48,41448,48
+60,Texas,Bexar,San Antonio,2016,48,65000,48
+32,Texas,Harris,Houston,2020,48,35000,48
+3,Virginia,Alexandria City,Alexandria,2017,51,1000,51
+57,Virginia,Richmond City,Richmond,2017,51,67000,51
+7,Virginia,Arlington,Arlington,2021,51,3000,51
+68,Washington,King,Seattle,2015,53,63000,53
+71,Washington,Pierce,Tacoma,NULL,53,70000,53
+10,Washington,King,Bellevue,2020,53,5210,53
+45,Wisconsin,Milwaukee,Milwaukee,NULL,55,53000,55
+44,Wisconsin,Dane,Madison,2020,55,48000,55
