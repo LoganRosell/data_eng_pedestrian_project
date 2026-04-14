@@ -221,16 +221,18 @@ WHERE priority = 1;
 
 --============================
 -- create timezone table for each us city
+-- We didn't end up needing this
 --============================
-drop table if exists us_city_timezones;
 
-CREATE TABLE us_city_timezones (
-  city varchar(100),
-  city_ascii varchar(100),
-  state_id varchar(2),
-  state_name varchar(100),
-  timezone text
-);
+-- drop table if exists us_city_timezones;
+
+-- CREATE TABLE us_city_timezones (
+--   city varchar(100),
+--   city_ascii varchar(100),
+--   state_id varchar(2),
+--   state_name varchar(100),
+--   timezone text
+-- );
 
 -- \copy us_city_timezones
 --   FROM '/Users/loganrosell/Desktop/WU_Data_Eng/data_eng_project_files/us_city_timezones.csv'
@@ -530,13 +532,20 @@ SELECT COUNT(*)
 -- DROP TABLE lat_lon_city_lookup;
 
 CREATE TABLE IF NOT EXISTS lat_lon_city_lookup (
- geocode_lat numeric,
- geocode_lon numeric,
+  geocode_lat numeric,
+  geocode_lon numeric,
   weather_lat numeric,
   weather_lon numeric,
-  city_id integer,
+  city_id integer REFERENCES cities (city_id),
   location_id integer
 );
+
+-- Make city_id and location_id foreign keys
+-- BEGIN;
+-- ALTER TABLE lat_lon_city_lookup 
+-- ADD CONSTRAINT fk_cities
+--   FOREIGN KEY (city_id) REFERENCES cities (city_id);
+-- COMMIT;
 
 -- add city IDs to table
 BEGIN;
@@ -624,9 +633,9 @@ COMMIT;
 --================================================
 -- Drop lon and lat columns from cities table
 --================================================
-ALTER TABLE cities 
-DROP COLUMN IF EXISTS longitude,
-DROP COLUMN IF EXISTS latitude;
+-- ALTER TABLE cities 
+-- DROP COLUMN IF EXISTS longitude,
+-- DROP COLUMN IF EXISTS latitude;
 
 
 
