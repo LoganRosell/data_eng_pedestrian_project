@@ -1,3 +1,7 @@
+-- fars migration 
+SELECT * FROM fars_staging
+LIMIT 5;
+
 ---- create normalized tables
 
 -- create table weather_conditions (
@@ -15,7 +19,7 @@
 --   precipitation_hours float
 -- );
 
--- not sure if we need this
+-- not sure if we need this actually
 -- create table roads (
 --   road_id bigserial primary key,
 --   road_characteristics text,
@@ -44,20 +48,13 @@ create table incidents (
   rel_roadway text
 );
 
----- alter table cities
-
+-- alter table cities
 -- add column fips_state_id int;
 -- add column FIPS_place int,
 -- add column viz_join_year int,
 -- add column longitude float,
 -- add column latitude float,
 -- add column elevation float;
-
--- UPDATE cities
--- SET  
---   fips_state_id = vz.fips_state_id::numeric
--- FROM vision_zero_cities AS vz
--- WHERE city_id = vz.phenomenal_id;
 
 SELECT * FROM cities LIMIT 10;
 
@@ -189,7 +186,7 @@ SELECT
 	f.rel_roadname AS rel_roadway
 FROM fars_staging as f
 JOIN cities as c
-	ON fips_state_id = f.state
+	ON fips_state_id::numeric = f.state::numeric
 WHERE 
 	f.state = 11 
 	AND (f.fatals > 0 AND f.peds > 0);
@@ -199,5 +196,39 @@ SELECT COUNT(*) FROM incidents;
 
 COMMIT;
 
-SELECT  * FROM incidents LIMIT 15;
+SELECT * FROM incidents LIMIT 15;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
