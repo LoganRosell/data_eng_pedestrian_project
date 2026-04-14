@@ -4,20 +4,21 @@ LIMIT 5;
 
 ---- create normalized tables
 
--- create table weather_conditions (
---   condition_id bigserial primary key,
---   city_id int not null references cities,
---   date date,
---   wind_speed_max float,
---   rainfall float,
---   snowfall float,
---   visibility int,
---   lighting_condition text,
---   precipitation_sum float,
---   temp_max float,
---   temp_min float,
---   precipitation_hours float
--- );
+create table weather_conditions (
+  condition_id bigserial primary key,
+  city_id int not null references cities,
+  date date,
+  wind_speed_max float,
+  rainfall float,
+  snowfall float,
+  visibility int,
+  lighting_condition text,
+  precipitation_sum float,
+  temp_max float,
+  temp_min float,
+  precipitation_hours float
+);
+
 
 -- not sure if we need this actually
 -- create table roads (
@@ -33,7 +34,6 @@ drop table if exists incidents;
 create table incidents (
   case_num int primary key,
   city_id int references cities,
-  condition_id int references weather_conditions,
   longitude float,
   latitude float,
   date date,
