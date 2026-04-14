@@ -377,74 +377,91 @@ FROM weather_data_location_lookup AS w
 -- Normalizing Weather Data
 --============================
 
--- reset weather_conidtion table
+--reset weather_conidtion table
 -- BEGIN;
--- TRUNCATE TABLE weather_conditions CASCADE;
+-- TRUNCATE TABLE weather_conditions;
 -- COMMIT;
 
 
+-- BEGIN;
+
+-- WITH city_names_table AS (
+--   WITH RankedMatches AS (
+--       SELECT 
+--           *,
+--           ROW_NUMBER() OVER (
+--               PARTITION BY c.city, c.state_abbr 
+--               ORDER BY (CASE WHEN g.funcstat = 'A' THEN 1 ELSE 2 END) ASC
+--           ) as priority
+--       FROM cities c
+--       LEFT JOIN us_geocodes g
+--         ON (UPPER(g.name) LIKE UPPER(REPLACE(c.city, ' DC', '')) || '%')
+--           AND (g.usps = c.state_abbr)
+--   )
+--   SELECT *
+--   FROM RankedMatches
+--   WHERE priority = 1
+-- )
+-- INSERT INTO weather_conditions(
+--                                 city_id,
+--                                 date,
+--                                 wind_speed_max,
+--                                 rainfall,
+--                                 snowfall,
+--                                 precipitation_sum,
+--                                 temp_max,
+--                                 temp_min,
+--                                 precipitation_hours)
+--   SELECT DISTINCT 
+--     cnt.city_id,
+--     wst.date,
+--     wst.wind_speed_10m_max_mph,
+--     wst.rain_sum_inches,
+--     wst.snowfall_sum_inches,
+--     wst.precipitation_sum_inches,
+--     wst.temperature_2m_max_f,
+--     wst.temperature_2m_min_f,
+--     wst.precipitation_hours
+  
+--   FROM weather_data_location_lookup AS wl
+--     JOIN weather_data_staging_table wst ON wst.location_id = wl.location_id
+--     CROSS JOIN LATERAL (
+--         SELECT 
+--             name, 
+--             usps, 
+--             lat, 
+--             lon,
+--             geoid
+--         FROM us_geocodes g
+--         ORDER BY 
+--             ST_SetSRID(ST_MakePoint(g.lon::double precision, g.lat::double precision), 4326) <-> 
+--             ST_SetSRID(ST_MakePoint(wl.longitude::double precision, wl.latitude::double precision), 4326)
+--         LIMIT 1
+--     ) AS geo
+-- JOIN city_names_table cnt ON cnt.geoid = geo.geoid;
+  
+-- COMMIT;
+
 BEGIN;
 
-WITH city_names_table AS (
-  WITH RankedMatches AS (
-      SELECT 
-          *,
-          ROW_NUMBER() OVER (
-              PARTITION BY c.city, c.state_abbr 
-              ORDER BY (CASE WHEN g.funcstat = 'A' THEN 1 ELSE 2 END) ASC
-          ) as priority
-      FROM cities c
-      LEFT JOIN us_geocodes g
-        ON (UPPER(g.name) LIKE UPPER(REPLACE(c.city, ' DC', '')) || '%')
-          AND (g.usps = c.state_abbr)
-  )
-  SELECT *
-  FROM RankedMatches
-  WHERE priority = 1
-)
-INSERT INTO weather_conditions(
-                                city_id,
-                                date,
-                                wind_speed_max,
-                                rainfall,
-                                snowfall,
-                                visibility,
-                                lighting_condition,
-                                precipitation_sum,
-                                temp_max,
-                                temp_min,
-                                precipitation_hours)
-  SELECT DISTINCT 
-    cnt.city_id,
-    wst.date,
-    wst.wind_speed_10m_max_mph,
-    wst.rain_sum_inches,
-    wst.snowfall_sum_inches,
-    0,
-    'idk',
-    wst.precipitation_sum_inches,
-    wst.temperature_2m_max_f,
-    wst.temperature_2m_min_f,
-    wst.precipitation_hours
-  
-  FROM weather_data_location_lookup AS wl
-    JOIN weather_data_staging_table wst ON wst.location_id = wl.location_id
-    CROSS JOIN LATERAL (
-        SELECT 
-            name, 
-            usps, 
-            lat, 
-            lon,
-            geoid
-        FROM us_geocodes g
-        ORDER BY 
-            ST_SetSRID(ST_MakePoint(g.lon::double precision, g.lat::double precision), 4326) <-> 
-            ST_SetSRID(ST_MakePoint(wl.longitude::double precision, wl.latitude::double precision), 4326)
-        LIMIT 1
-    ) AS geo
-JOIN city_names_table cnt ON cnt.geoid = geo.geoid;
-  
+INSERT INTO weather_conditions (city_id, date, wind_speed_max, rainfall, snowfall, precipitation_sum, temp_max, temp_min, precipitation_hours)
+SELECT 
+  llcl.city_id,
+  wdst.date,
+  wdst.wind_speed_10m_max_mph,
+  wdst.rain_sum_inches,
+  wdst.snowfall_sum_inches,
+  wdst.precipitation_sum_inches,
+  wdst.temperature_2m_max_f,
+  wdst.temperature_2m_min_f,
+  wdst.precipitation_hours
+FROM weather_data_staging_table AS wdst
+JOIN weather_data_location_lookup AS wdll
+ON wdst.location_id = wdll.location_id
+JOIN lat_lon_city_lookup AS llcl
+ON wdst.location_id = llcl.location_id
 
+  
 COMMIT;
 
 --====================================
