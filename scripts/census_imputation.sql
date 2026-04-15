@@ -6,90 +6,6 @@ DELETE FROM census_city_pops
 WHERE census_state_id = '37' 
   AND census_place_id = '01520';
 
-WITH year_range AS (
-  SELECT
-    MIN(year) AS min_year,
-    MAX(year) AS max_year
-  FROM census_city_pops
-), 
-year_series AS (
-  -- We now KEEP 2020 here so the 'spine' has a place for the imputed data
-  SELECT generate_series(min_year, max_year, 1) AS year_slot
-  FROM year_range
-),
-unique_cities AS (
-  SELECT DISTINCT 
-    census_city AS city_name, 
-    census_state_id, 
-    census_place_id 
-  FROM census_city_pops
-),
-joined_data AS (
-  -- This is your previous logic, creating the 'spine' with NULLs for 2020
-  SELECT
-    y.year_slot AS year,
-    uc.city_name,
-    c.census_pop
-  FROM year_series y
-  CROSS JOIN unique_cities uc
-  LEFT JOIN census_city_pops c 
-    ON y.year_slot = c.year 
-    AND uc.census_place_id = c.census_place_id
-    AND uc.census_state_id = c.census_state_id
-)
--- Final Step: Apply the Linear Interpolation logic
-SELECT 
-  year, 
-  city_name,
-  CASE 
-    WHEN year = 2020 THEN 
-      (LAG(census_pop) OVER (PARTITION BY city_name ORDER BY year) + 
-       LEAD(census_pop) OVER (PARTITION BY city_name ORDER BY year)) / 2
-    ELSE census_pop
-  END AS census_pop_imputed
-FROM joined_data
-ORDER BY city_name, year;
-
-CREATE TABLE census_pops_imputed AS  -- This line makes it permanent
-WITH year_range AS (
-  SELECT MIN(year) AS min_year, MAX(year) AS max_year
-  FROM census_city_pops
-),
-year_series AS (
-  -- We now KEEP 2020 here so the 'spine' has a place for the imputed data
-  SELECT generate_series(min_year, max_year, 1) AS year_slot
-  FROM year_range
-),
-unique_cities AS (
-  SELECT DISTINCT 
-    census_city AS city_name, 
-    census_state_id, 
-    census_place_id 
-  FROM census_city_pops
-),
-joined_data AS (
-  -- This is your previous logic, creating the 'spine' with NULLs for 2020
-  SELECT
-    y.year_slot AS year,
-    uc.city_name,
-    c.census_pop
-  FROM year_series y
-  CROSS JOIN unique_cities uc
-  LEFT JOIN census_city_pops c 
-    ON y.year_slot = c.year 
-    AND uc.census_place_id = c.census_place_id
-    AND uc.census_state_id = c.census_state_id
-)SELECT 
-  year, 
-  city_name,
-  CASE 
-    WHEN year = 2020 THEN 
-      (LAG(census_pop) OVER (PARTITION BY city_name ORDER BY year) + 
-       LEAD(census_pop) OVER (PARTITION BY city_name ORDER BY year)) / 2
-    ELSE census_pop
-  END AS census_pop_imputed
-FROM joined_data;
-
 DROP TABLE IF EXISTS census_pops_imputed;
 
 CREATE TABLE census_pops_imputed (
@@ -136,7 +52,6 @@ joined_data AS (
     AND uc.census_state_id = c.census_state_id
 )
 SELECT 
-  -- CONCATENATION LOGIC: State + Place + Year
   census_state_id || census_place_id || year::TEXT AS city_year_id,
   year, 
   census_city,
