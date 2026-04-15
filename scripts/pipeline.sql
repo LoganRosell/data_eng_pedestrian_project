@@ -229,6 +229,16 @@ COMMIT;
 
 BEGIN TRANSACTION;
 
+-- fill in state abbreviation table
+UPDATE cities AS c
+SET state_abbr = sl.abbr
+FROM states_lookup AS sl
+WHERE UPPER(c.state) = sl.state_name;
+
+COMMIT;
+
+BEGIN TRANSACTION;
+
 DROP TABLE IF EXISTS weather_conditions CASCADE;
 CREATE TABLE weather_conditions (
   condition_id bigserial primary key,
