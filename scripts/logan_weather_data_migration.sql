@@ -638,6 +638,96 @@ COMMIT;
 -- DROP COLUMN IF EXISTS latitude;
 
 
+--================================================
+-- Row Counts for all Normalized Tables
+--================================================
+-- Cities Table
+SELECT COUNT(*)
+FROM cities;
+
+-- Lat Lon City Lookup Table
+SELECT COUNT(*)
+FROM lat_lon_city_lookup;
+
+-- Incidents Table
+SELECT COUNT(*)
+FROM incidents;
+
+SELECT COUNT(city_id)
+FROM incidents
+GROUP BY city_id;
+
+-- Weather Conditions Table
+SELECT COUNT(*)
+FROM weather_conditions;
+
+SELECT COUNT(*)
+FROM weather_conditions
+GROUP BY city_id;
+
+-- Census Pops Imputed Table
+SELECT COUNT(*)
+FROM census_pops_imputed;
+
+SELECT COUNT(*)
+FROM census_pops_imputed
+GROUP BY city_name;
+
+
+--================================================
+-- Analysis Queries
+--================================================
+
+SELECT 
+  ROUND(AVG(wc.temp_max)::numeric, 1) AS avg_max_temp,
+  c.city
+FROM weather_conditions AS wc
+JOIN cities AS c ON wc.city_id = c.city_id
+GROUP BY c.city
+ORDER BY avg_max_temp DESC;
+
+SELECT
+  c.city,
+  c.city_id,
+  cpi.census_pop_imputed,
+  cpi.year,
+  ROUND(AVG(wc.temp_max)::numeric, 1) AS avg_max_temp
+FROM cities AS c
+JOIN census_pops_imputed AS cpi ON c.fips_place = cpi.census_place_id AND c.fips_state_id = cpi.census_state_id
+JOIN weather_conditions AS wc ON wc.city_id = c.city_id
+GROUP BY c.city_id, cpi.census_pop_imputed, cpi.year
+ORDER BY avg_max_temp DESC;
+
+
+
+
+
+WITH start_year_end_year AS (
+  SELECT 
+    MIN(EXTRACT(year FROM i.date)) AS start_year,
+    MAX(EXTRACT(year FROM i.date)) AS end_year
+  FROM incidents AS i
+),
+time_table AS (
+  SELECT
+    generate_series(start_year, end_year) AS year
+  FROM start_year_end_year
+),
+year_city_grid AS (
+  SELECT tt.year, c.city, c.city_id
+  FROM time_table tt
+  CROSS JOIN cities c
+)
+SELECT 
+  grid.year,
+  grid.city,
+  COUNT(i.date) AS incident_count
+FROM year_city_grid AS grid
+LEFT JOIN incidents AS i 
+  ON grid.year = EXTRACT(year FROM i.date) 
+  AND grid.city_id = i.city_id
+GROUP BY grid.year, grid.city
+ORDER BY grid.city, grid.year;
 
 
 
