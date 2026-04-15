@@ -32,7 +32,7 @@ WITH counts AS (
 )
 SELECT 
 	*,
-	incident_count / population AS uhh
+	incident_count / population AS per_capita_incidents
 FROM counts;
 
 -- day of week counts

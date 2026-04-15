@@ -1,63 +1,308 @@
-census_id,census_city,census_pop,census_state_id,census_place_id
-1,"Anchorage municipality, Alaska",289600,02,03000
-2,"Tempe city, Arizona",190113,04,73000
-3,"Alameda city, California",78807,06,00562
-4,"Berkeley city, California",121730,06,06000
-5,"Fremont city, California",228191,06,26000
-6,"Los Angeles city, California",3878718,06,44000
-7,"Sacramento city, California",535787,06,64000
-8,"San Diego city, California",1404461,06,66000
-9,"San Francisco city, California",827526,06,67000
-10,"San Jose city, California",997395,06,68000
-11,"Santa Barbara city, California",87291,06,69070
-12,"Santa Rosa city, California",177531,06,70098
-13,"Vista city, California",99330,06,82996
-14,"Boulder city, Colorado",106802,08,07850
-15,"Denver city, Colorado",729019,08,20000
-16,"Stamford city, Connecticut",139112,09,73000
-17,"Washington city, District of Columbia",702250,11,50000
-18,"Deerfield Beach city, Florida",90487,12,16725
-19,"Fort Lauderdale city, Florida",190640,12,24000
-20,"Gainesville city, Florida",148716,12,25175
-21,"Orlando city, Florida",334871,12,53000
-22,"Tampa city, Florida",414575,12,71000
-23,"West Palm Beach city, Florida",127733,12,76600
-24,"Atlanta city, Georgia",520066,13,04000
-25,"Savannah city, Georgia",148809,13,69000
-26,"Chicago city, Illinois",2721326,17,14000
-27,"Louisville/Jefferson County metro government (balance), Kentucky",640793,21,48006
-28,"Boston city, Massachusetts",673822,25,07000
-29,"Cambridge city, Massachusetts",121203,25,11000
-30,"Somerville city, Massachusetts",82144,25,62535
-31,"Ann Arbor city, Michigan",122914,26,03000
-32,"Minneapolis city, Minnesota",428572,27,43000
-33,"Columbia city, Missouri",130913,29,15670
-34,"Kansas City city, Missouri",516045,29,38000
-35,"Omaha city, Nebraska",489263,31,37000
-36,"Las Vegas city, Nevada",678924,32,40000
-37,"Jersey City city, New Jersey",302822,34,36000
-38,"Albuquerque city, New Mexico",560333,35,02000
-39,"New York city, New York",8478072,36,51000
-40,"Apex town, North Carolina",75950,37,01520
-41,"Charlotte city, North Carolina",943474,37,12000
-42,"Durham city, North Carolina",301877,37,19000
-43,"Columbus city, Ohio",931551,39,18000
-44,"Toledo city, Ohio",265651,39,77000
-45,"Oklahoma City city, Oklahoma",713014,40,55000
-46,"Eugene city, Oregon",178789,41,23850
-47,"Portland city, Oregon",636958,41,59000
-48,"Bethlehem city, Pennsylvania",79959,42,06088
-49,"Philadelphia city, Pennsylvania",1573916,42,60000
-50,"Knoxville city, Tennessee",198708,47,40000
-51,"Austin city, Texas",993771,48,05000
-52,"El Paso city, Texas",681724,48,24000
-53,"Houston city, Texas",2387910,48,35000
-54,"San Antonio city, Texas",1526621,48,65000
-55,"Alexandria city, Virginia",159102,51,01000
-56,"Arlington CDP, Virginia",239807,51,03000
-57,"Richmond city, Virginia",233655,51,67000
-58,"Bellevue city, Washington",154387,53,05210
-59,"Seattle city, Washington",780992,53,63000
-60,"Tacoma city, Washington",228187,53,70000
-61,"Madison city, Wisconsin",285318,55,48000
-62,"Milwaukee city, Wisconsin",563512,55,53000
+year,name,population,fips_state_id,fips_place_id
+2018,"Anchorage municipality, Alaska",291538,02,03000
+2018,"Tempe city, Arizona",192354,04,73000
+2018,"Sacramento city, California",508517,06,64000
+2018,"Santa Rosa city, California",177587,06,70098
+2018,"Alameda city, California",78322,06,00562
+2018,"San Diego city, California",1425999,06,66000
+2018,"San Jose city, California",1030119,06,68000
+2018,"San Francisco city, California",883305,06,67000
+2018,"Los Angeles city, California",3990469,06,44000
+2018,"Vista city, California",101227,06,82996
+2018,"Berkeley city, California",121654,06,06000
+2018,"Fremont city, California",237815,06,26000
+2018,"Santa Barbara city, California",91330,06,69070
+2018,"Boulder city, Colorado",107355,08,07850
+2018,"Denver city, Colorado",716492,08,20000
+2018,"Stamford city, Connecticut",129770,09,73000
+2018,"Washington city, District of Columbia",702455,11,50000
+2018,"Fort Lauderdale city, Florida",182611,12,24000
+2018,"Deerfield Beach city, Florida",80854,12,16725
+2018,"Orlando city, Florida",285705,12,53000
+2018,"Gainesville city, Florida",133851,12,25175
+2018,"West Palm Beach city, Florida",111389,12,76600
+2018,"Tampa city, Florida",392905,12,71000
+2018,"Savannah city, Georgia",145852,13,69000
+2018,"Atlanta city, Georgia",498073,13,04000
+2018,"Chicago city, Illinois",2705988,17,14000
+2018,"Louisville/Jefferson County metro government (balance), Kentucky",620149,21,48006
+2018,"Boston city, Massachusetts",695926,25,07000
+2018,"Somerville city, Massachusetts",81568,25,62535
+2018,"Cambridge city, Massachusetts",118967,25,11000
+2018,"Ann Arbor city, Michigan",121885,26,03000
+2018,"Minneapolis city, Minnesota",425395,27,43000
+2018,"Kansas City city, Missouri",491809,29,38000
+2018,"Columbia city, Missouri",123182,29,15670
+2018,"Omaha city, Nebraska",468267,31,37000
+2018,"Las Vegas city, Nevada",644664,32,40000
+2018,"Jersey City city, New Jersey",265560,34,36000
+2018,"Albuquerque city, New Mexico",560234,35,02000
+2018,"New York city, New York",8398748,36,51000
+2018,"Durham city, North Carolina",274497,37,19000
+2018,"Charlotte city, North Carolina",872506,37,12000
+2018,"Toledo city, Ohio",274973,39,77000
+2018,"Columbus city, Ohio",895877,39,18000
+2018,"Oklahoma City city, Oklahoma",649410,40,55000
+2018,"Eugene city, Oregon",171259,41,23850
+2018,"Portland city, Oregon",652573,41,59000
+2018,"Philadelphia city, Pennsylvania",1584138,42,60000
+2018,"Bethlehem city, Pennsylvania",75979,42,06088
+2018,"Knoxville city, Tennessee",187514,47,40000
+2018,"El Paso city, Texas",682686,48,24000
+2018,"Austin city, Texas",964243,48,05000
+2018,"Houston city, Texas",2326090,48,35000
+2018,"San Antonio city, Texas",1532212,48,65000
+2018,"Arlington CDP, Virginia",237521,51,03000
+2018,"Richmond city, Virginia",228783,51,67000
+2018,"Alexandria city, Virginia",160530,51,01000
+2018,"Tacoma city, Washington",216271,53,70000
+2018,"Bellevue city, Washington",147595,53,05210
+2018,"Seattle city, Washington",744949,53,63000
+2018,"Milwaukee city, Wisconsin",592002,55,53000
+2018,"Madison city, Wisconsin",258034,55,48000
+2019,"Anchorage municipality, Alaska",288000,02,03000
+2019,"Tempe city, Arizona",195816,04,73000
+2019,"Berkeley city, California",121353,06,06000
+2019,"Fremont city, California",241117,06,26000
+2019,"San Jose city, California",1021786,06,68000
+2019,"San Francisco city, California",881549,06,67000
+2019,"Vista city, California",101639,06,82996
+2019,"Los Angeles city, California",3979537,06,44000
+2019,"San Diego city, California",1423852,06,66000
+2019,"Santa Rosa city, California",176761,06,70098
+2019,"Alameda city, California",77630,06,00562
+2019,"Sacramento city, California",513620,06,64000
+2019,"Santa Barbara city, California",91357,06,69070
+2019,"Denver city, Colorado",727211,08,20000
+2019,"Boulder city, Colorado",105670,08,07850
+2019,"Stamford city, Connecticut",129636,09,73000
+2019,"Washington city, District of Columbia",705749,11,50000
+2019,"Orlando city, Florida",287435,12,53000
+2019,"Tampa city, Florida",399690,12,71000
+2019,"Gainesville city, Florida",133990,12,25175
+2019,"West Palm Beach city, Florida",111952,12,76600
+2019,"Deerfield Beach city, Florida",81070,12,16725
+2019,"Fort Lauderdale city, Florida",182434,12,24000
+2019,"Atlanta city, Georgia",506804,13,04000
+2019,"Savannah city, Georgia",144457,13,69000
+2019,"Chicago city, Illinois",2693959,17,14000
+2019,"Louisville/Jefferson County metro government (balance), Kentucky",617630,21,48006
+2019,"Cambridge city, Massachusetts",118925,25,11000
+2019,"Boston city, Massachusetts",694295,25,07000
+2019,"Somerville city, Massachusetts",81358,25,62535
+2019,"Ann Arbor city, Michigan",119976,26,03000
+2019,"Minneapolis city, Minnesota",429605,27,43000
+2019,"Columbia city, Missouri",123204,29,15670
+2019,"Kansas City city, Missouri",495278,29,38000
+2019,"Omaha city, Nebraska",478203,31,37000
+2019,"Las Vegas city, Nevada",651297,32,40000
+2019,"Jersey City city, New Jersey",262075,34,36000
+2019,"Albuquerque city, New Mexico",560504,35,02000
+2019,"New York city, New York",8336817,36,51000
+2019,"Charlotte city, North Carolina",885707,37,12000
+2019,"Durham city, North Carolina",279447,37,19000
+2019,"Columbus city, Ohio",902073,39,18000
+2019,"Toledo city, Ohio",272778,39,77000
+2019,"Oklahoma City city, Oklahoma",655158,40,55000
+2019,"Eugene city, Oregon",172614,41,23850
+2019,"Portland city, Oregon",653467,41,59000
+2019,"Bethlehem city, Pennsylvania",76044,42,06088
+2019,"Philadelphia city, Pennsylvania",1584064,42,60000
+2019,"Knoxville city, Tennessee",187610,47,40000
+2019,"San Antonio city, Texas",1547250,48,65000
+2019,"El Paso city, Texas",681729,48,24000
+2019,"Houston city, Texas",2316797,48,35000
+2019,"Austin city, Texas",979263,48,05000
+2019,"Arlington CDP, Virginia",236842,51,03000
+2019,"Richmond city, Virginia",230436,51,67000
+2019,"Alexandria city, Virginia",159428,51,01000
+2019,"Seattle city, Washington",753655,53,63000
+2019,"Tacoma city, Washington",217834,53,70000
+2019,"Bellevue city, Washington",148145,53,05210
+2019,"Milwaukee city, Wisconsin",590157,55,53000
+2019,"Madison city, Wisconsin",259673,55,48000
+2021,"Anchorage municipality, Alaska",288121,02,03000
+2021,"Tempe city, Arizona",184109,04,73000
+2021,"Vista city, California",98671,06,82996
+2021,"Santa Barbara city, California",88252,06,69070
+2021,"Los Angeles city, California",3849306,06,44000
+2021,"Santa Rosa city, California",176942,06,70098
+2021,"Alameda city, California",76352,06,00562
+2021,"Fremont city, California",227523,06,26000
+2021,"Berkeley city, California",117147,06,06000
+2021,"Sacramento city, California",525028,06,64000
+2021,"San Diego city, California",1381600,06,66000
+2021,"San Francisco city, California",815201,06,67000
+2021,"San Jose city, California",983530,06,68000
+2021,"Boulder city, Colorado",104178,08,07850
+2021,"Denver city, Colorado",711463,08,20000
+2021,"Stamford city, Connecticut",136312,09,73000
+2021,"Washington city, District of Columbia",670050,11,50000
+2021,"Deerfield Beach city, Florida",86355,12,16725
+2021,"Fort Lauderdale city, Florida",181666,12,24000
+2021,"Tampa city, Florida",387037,12,71000
+2021,"West Palm Beach city, Florida",117253,12,76600
+2021,"Gainesville city, Florida",140406,12,25175
+2021,"Orlando city, Florida",309193,12,53000
+2021,"Atlanta city, Georgia",496480,13,04000
+2021,"Savannah city, Georgia",147087,13,69000
+2021,"Chicago city, Illinois",2696561,17,14000
+2021,"Louisville/Jefferson County metro government (balance), Kentucky",628577,21,48006
+2021,"Boston city, Massachusetts",654281,25,07000
+2021,"Cambridge city, Massachusetts",117097,25,11000
+2021,"Somerville city, Massachusetts",79819,25,62535
+2021,"Ann Arbor city, Michigan",121541,26,03000
+2021,"Minneapolis city, Minnesota",425338,27,43000
+2021,"Kansas City city, Missouri",508415,29,38000
+2021,"Columbia city, Missouri",126850,29,15670
+2021,"Omaha city, Nebraska",487299,31,37000
+2021,"Las Vegas city, Nevada",646776,32,40000
+2021,"Jersey City city, New Jersey",283943,34,36000
+2021,"Albuquerque city, New Mexico",562591,35,02000
+2021,"New York city, New York",8467513,36,51000
+2021,"Charlotte city, North Carolina",879697,37,12000
+2021,"Durham city, North Carolina",285439,37,19000
+2021,"Columbus city, Ohio",907310,39,18000
+2021,"Toledo city, Ohio",268504,39,77000
+2021,"Oklahoma City city, Oklahoma",687691,40,55000
+2021,"Eugene city, Oregon",175102,41,23850
+2021,"Portland city, Oregon",642218,41,59000
+2021,"Bethlehem city, Pennsylvania",75134,42,06088
+2021,"Philadelphia city, Pennsylvania",1576251,42,60000
+2021,"Knoxville city, Tennessee",192657,47,40000
+2021,"Austin city, Texas",964000,48,05000
+2021,"Houston city, Texas",2287047,48,35000
+2021,"El Paso city, Texas",678422,48,24000
+2021,"San Antonio city, Texas",1451863,48,65000
+2021,"Richmond city, Virginia",226604,51,67000
+2021,"Alexandria city, Virginia",154706,51,01000
+2021,"Arlington CDP, Virginia",232965,51,03000
+2021,"Seattle city, Washington",733904,53,63000
+2021,"Bellevue city, Washington",149429,53,05210
+2021,"Tacoma city, Washington",219203,53,70000
+2021,"Madison city, Wisconsin",269162,55,48000
+2021,"Milwaukee city, Wisconsin",569326,55,53000
+2022,"Anchorage municipality, Alaska",287145,02,03000
+2022,"Tempe city, Arizona",185939,04,73000
+2022,"Alameda city, California",76039,06,00562
+2022,"Berkeley city, California",118942,06,06000
+2022,"Fremont city, California",223859,06,26000
+2022,"Los Angeles city, California",3822224,06,44000
+2022,"Sacramento city, California",528026,06,64000
+2022,"San Diego city, California",1381182,06,66000
+2022,"San Francisco city, California",808437,06,67000
+2022,"San Jose city, California",971265,06,68000
+2022,"Santa Barbara city, California",87519,06,69070
+2022,"Santa Rosa city, California",177185,06,70098
+2022,"Vista city, California",97766,06,82996
+2022,"Boulder city, Colorado",105482,08,07850
+2022,"Denver city, Colorado",713252,08,20000
+2022,"Stamford city, Connecticut",136197,09,73000
+2022,"Washington city, District of Columbia",671803,11,50000
+2022,"Deerfield Beach city, Florida",86781,12,16725
+2022,"Fort Lauderdale city, Florida",183156,12,24000
+2022,"Gainesville city, Florida",145212,12,25175
+2022,"Orlando city, Florida",316086,12,53000
+2022,"Tampa city, Florida",398160,12,71000
+2022,"West Palm Beach city, Florida",120922,12,76600
+2022,"Atlanta city, Georgia",499121,13,04000
+2022,"Savannah city, Georgia",147987,13,69000
+2022,"Chicago city, Illinois",2665064,17,14000
+2022,"Louisville/Jefferson County metro government (balance), Kentucky",624450,21,48006
+2022,"Boston city, Massachusetts",649768,25,07000
+2022,"Cambridge city, Massachusetts",118489,25,11000
+2022,"Somerville city, Massachusetts",79761,25,62535
+2022,"Ann Arbor city, Michigan",119871,26,03000
+2022,"Minneapolis city, Minnesota",425104,27,43000
+2022,"Columbia city, Missouri",128545,29,15670
+2022,"Kansas City city, Missouri",509247,29,38000
+2022,"Omaha city, Nebraska",485146,31,37000
+2022,"Las Vegas city, Nevada",656302,32,40000
+2022,"Jersey City city, New Jersey",286661,34,36000
+2022,"Albuquerque city, New Mexico",561006,35,02000
+2022,"New York city, New York",8335897,36,51000
+2022,"Apex town, North Carolina",71064,37,01520
+2022,"Charlotte city, North Carolina",897720,37,12000
+2022,"Durham city, North Carolina",291844,37,19000
+2022,"Columbus city, Ohio",908372,39,18000
+2022,"Toledo city, Ohio",266289,39,77000
+2022,"Oklahoma City city, Oklahoma",694768,40,55000
+2022,"Eugene city, Oregon",177930,41,23850
+2022,"Portland city, Oregon",635296,41,59000
+2022,"Bethlehem city, Pennsylvania",78854,42,06088
+2022,"Philadelphia city, Pennsylvania",1567258,42,60000
+2022,"Knoxville city, Tennessee",195871,47,40000
+2022,"Austin city, Texas",975335,48,05000
+2022,"El Paso city, Texas",677469,48,24000
+2022,"Houston city, Texas",2304414,48,35000
+2022,"San Antonio city, Texas",1472904,48,65000
+2022,"Alexandria city, Virginia",155525,51,01000
+2022,"Arlington CDP, Virginia",234000,51,03000
+2022,"Richmond city, Virginia",229395,51,67000
+2022,"Bellevue city, Washington",152765,53,05210
+2022,"Seattle city, Washington",749267,53,63000
+2022,"Tacoma city, Washington",221790,53,70000
+2022,"Madison city, Wisconsin",272907,55,48000
+2022,"Milwaukee city, Wisconsin",563306,55,53000
+2023,"Anchorage municipality, Alaska",286075,02,03000
+2023,"Tempe city, Arizona",189839,04,73000
+2023,"Alameda city, California",75344,06,00562
+2023,"Berkeley city, California",118962,06,06000
+2023,"Fremont city, California",226211,06,26000
+2023,"Los Angeles city, California",3820963,06,44000
+2023,"Sacramento city, California",526383,06,64000
+2023,"San Diego city, California",1388312,06,66000
+2023,"San Francisco city, California",808988,06,67000
+2023,"San Jose city, California",969615,06,68000
+2023,"Santa Barbara city, California",86495,06,69070
+2023,"Santa Rosa city, California",175861,06,70098
+2023,"Vista city, California",98336,06,82996
+2023,"Boulder city, Colorado",105893,08,07850
+2023,"Denver city, Colorado",716577,08,20000
+2023,"Stamford city, Connecticut",136212,09,73000
+2023,"Washington city, District of Columbia",678972,11,50000
+2023,"Deerfield Beach city, Florida",87322,12,16725
+2023,"Fort Lauderdale city, Florida",184263,12,24000
+2023,"Gainesville city, Florida",145800,12,25175
+2023,"Orlando city, Florida",320753,12,53000
+2023,"Tampa city, Florida",403361,12,71000
+2023,"West Palm Beach city, Florida",124148,12,76600
+2023,"Atlanta city, Georgia",510826,13,04000
+2023,"Savannah city, Georgia",147751,13,69000
+2023,"Chicago city, Illinois",2664454,17,14000
+2023,"Louisville/Jefferson County metro government (balance), Kentucky",622987,21,48006
+2023,"Boston city, Massachusetts",652442,25,07000
+2023,"Cambridge city, Massachusetts",118208,25,11000
+2023,"Somerville city, Massachusetts",80407,25,62535
+2023,"Ann Arbor city, Michigan",119380,26,03000
+2023,"Minneapolis city, Minnesota",425142,27,43000
+2023,"Columbia city, Missouri",129328,29,15670
+2023,"Kansas City city, Missouri",510671,29,38000
+2023,"Omaha city, Nebraska",483362,31,37000
+2023,"Las Vegas city, Nevada",660942,32,40000
+2023,"Jersey City city, New Jersey",291663,34,36000
+2023,"Albuquerque city, New Mexico",560283,35,02000
+2023,"New York city, New York",8258035,36,51000
+2023,"Apex town, North Carolina",72213,37,01520
+2023,"Charlotte city, North Carolina",911307,37,12000
+2023,"Durham city, North Carolina",295845,37,19000
+2023,"Columbus city, Ohio",909074,39,18000
+2023,"Toledo city, Ohio",265306,39,77000
+2023,"Oklahoma City city, Oklahoma",702654,40,55000
+2023,"Eugene city, Oregon",177900,41,23850
+2023,"Portland city, Oregon",630395,41,59000
+2023,"Bethlehem city, Pennsylvania",77841,42,06088
+2023,"Philadelphia city, Pennsylvania",1550542,42,60000
+2023,"Knoxville city, Tennessee",198175,47,40000
+2023,"Austin city, Texas",979700,48,05000
+2023,"El Paso city, Texas",678945,48,24000
+2023,"Houston city, Texas",2311461,48,35000
+2023,"San Antonio city, Texas",1495312,48,65000
+2023,"Alexandria city, Virginia",155230,51,01000
+2023,"Arlington CDP, Virginia",234162,51,03000
+2023,"Richmond city, Virginia",229247,51,67000
+2023,"Bellevue city, Washington",151579,53,05210
+2023,"Seattle city, Washington",755081,53,63000
+2023,"Tacoma city, Washington",222932,53,70000
+2023,"Madison city, Wisconsin",280307,55,48000
+2023,"Milwaukee city, Wisconsin",561369,55,53000
