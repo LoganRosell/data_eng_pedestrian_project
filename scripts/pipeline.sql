@@ -390,8 +390,8 @@ BEGIN TRANSACTION;
 INSERT INTO incidents (
   case_num,
   city_id,
-  incident_longitude,
   incident_latitude,
+  incident_longitude,
   date,
   time,
   drunk_driver,
@@ -433,8 +433,8 @@ WHERE
 INSERT INTO incidents (
   case_num,
   city_id,
-  incident_longitude,
   incident_latitude,
+  incident_longitude,
   date,
   time,
   drunk_driver,
