@@ -258,8 +258,8 @@ CREATE TABLE incidents (
   case_num int primary key,
   city_id int references cities,
   condition_id int references weather_conditions(condition_id),
-  incident_longitude float,
   incident_latitude float,
+  incident_longitude float,
   date date,
   time time,
   -- impact_speed_mph int, -- may add later
