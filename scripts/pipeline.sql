@@ -298,17 +298,20 @@ WHERE fips_state_id = '37'
   AND fips_place_id = '01520';
 
 DROP TABLE IF EXISTS census_pops_imputed;
+
 CREATE TABLE census_pops_imputed (
-  city_year_id TEXT PRIMARY KEY,    
-  year INTEGER,
+  city_year_id TEXT PRIMARY KEY,
+  city_id INTEGER REFERENCES cities(city_id),
+  year INTEGER NOT NULL,
   city_name VARCHAR(100),
-  fips_state_id CHAR(2),
-  fips_place_id CHAR(5),
+  fips_state_id CHAR(2) NOT NULL,
+  fips_place_id CHAR(5) NOT NULL,
   census_pop_imputed NUMERIC
 );
 
 INSERT INTO census_pops_imputed (
     city_year_id, 
+    city_id,
     year, 
     city_name, 
     fips_state_id, 
@@ -342,18 +345,22 @@ joined_data AS (
     AND uc.fips_state_id = c.fips_state_id
 )
 SELECT 
-  fips_state_id || fips_place_id || year::TEXT AS city_year_id,
-  year, 
-  census_city,
-  fips_state_id,
-  fips_place_id,
+  j.fips_state_id || j.fips_place_id || j.year::TEXT AS city_year_id,
+  ci.city_id,
+  j.year, 
+  j.census_city,
+  j.fips_state_id,
+  j.fips_place_id,
   CASE 
-    WHEN year = 2020 THEN 
-      (LAG(census_pop) OVER (PARTITION BY census_city ORDER BY year) + 
-       LEAD(census_pop) OVER (PARTITION BY census_city ORDER BY year)) / 2
-    ELSE census_pop
+    WHEN j.year = 2020 THEN 
+      (LAG(j.census_pop) OVER (PARTITION BY j.census_city ORDER BY j.year) + 
+       LEAD(j.census_pop) OVER (PARTITION BY j.census_city ORDER BY j.year)) / 2
+    ELSE j.census_pop
   END AS census_pop_imputed
-FROM joined_data;
+FROM joined_data AS j
+JOIN cities AS ci
+  ON ci.fips_place_id = j.fips_place_id
+  AND ci.fips_state_id = j.fips_state_id;
 
 COMMIT;
 
@@ -386,7 +393,7 @@ BEGIN TRANSACTION;
 -- fatals > 0 
 -- involving a pedestrian, where peds > 0
 
--- first the citiies that aren't Washington DC...
+-- first the cities that aren't Washington DC...
 INSERT INTO incidents (
   case_num,
   city_id,
