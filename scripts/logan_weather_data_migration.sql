@@ -868,7 +868,7 @@ DROP VIEW IF EXISTS annual_precip_vs_crashes;
 CREATE OR REPLACE VIEW annual_precip_vs_crashes AS(
 WITH daily_precip AS (
   SELECT 
-  ROUND(AVG(w.precipitation_sum::numeric),3) *365 AS avg_annual_precip_inch,
+  ROUND(AVG(w.precipitation_sum::numeric) *365, 1) AS avg_annual_precip_inch,
   w.city_id
 FROM weather_conditions AS w
 GROUP BY city_id
@@ -887,8 +887,58 @@ ORDER BY avg_annual_cases_per_100k DESC
 
 SELECT * FROM annual_precip_vs_crashes;
 
+SELECT 
+    ROUND(regr_slope(avg_annual_cases_per_100k, avg_annual_precip_inch)::numeric, 3) AS slope,
+    ROUND(regr_intercept(avg_annual_cases_per_100k, avg_annual_precip_inch)::numeric, 1) AS intercept,
+    ROUND(regr_r2(avg_annual_cases_per_100k, avg_annual_precip_inch)::numeric, 4) AS r_squared,
+    ROUND(corr(avg_annual_cases_per_100k, avg_annual_precip_inch)::numeric, 4) AS correlation_coeff
+FROM annual_precip_vs_crashes;
 
 
+
+-- scatter plot data for max temp
+
+DROP VIEW IF EXISTS avg_max_temp_vs_crashes;
+
+CREATE OR REPLACE VIEW avg_max_temp_vs_crashes AS(
+WITH daily_precip AS (
+  SELECT 
+  ROUND(AVG(w.temp_max::numeric), 1) AS avg_max_temp,
+  ROUND(AVG(w.temp_min::numeric), 1) AS avg_min_temp,
+  w.city_id
+FROM weather_conditions AS w
+GROUP BY city_id
+)
+SELECT
+  c.city, 
+  ROUND(COUNT(i.case_num) / AVG(census_pop_imputed) * 100000 / 5, 1) AS avg_annual_cases_per_100k,
+  dp.avg_max_temp,
+  dp.avg_min_temp
+FROM cities AS c
+JOIN incidents AS i ON c.city_id = i.city_id
+JOIN census_pops_imputed AS pop ON c.fips_place_id = pop.fips_place_id AND c.fips_state_id = pop.fips_state_id
+JOIN daily_precip AS dp ON c.city_id = dp.city_id
+GROUP BY c.city, avg_max_temp, avg_min_temp
+ORDER BY avg_annual_cases_per_100k DESC
+);
+
+SELECT * FROM avg_max_temp_vs_crashes;
+
+--regression for avg_max_temp
+SELECT 
+    ROUND(regr_slope(avg_annual_cases_per_100k, avg_max_temp)::numeric, 3) AS slope,
+    ROUND(regr_intercept(avg_annual_cases_per_100k, avg_max_temp)::numeric, 1) AS intercept,
+    ROUND(regr_r2(avg_annual_cases_per_100k, avg_max_temp)::numeric, 4) AS r_squared,
+    ROUND(corr(avg_annual_cases_per_100k, avg_max_temp)::numeric, 4) AS correlation_coeff
+FROM avg_max_temp_vs_crashes;
+
+--regression for avg_min_temp
+SELECT 
+    ROUND(regr_slope(avg_annual_cases_per_100k, avg_min_temp)::numeric, 3) AS slope,
+    ROUND(regr_intercept(avg_annual_cases_per_100k, avg_min_temp)::numeric, 1) AS intercept,
+    ROUND(regr_r2(avg_annual_cases_per_100k, avg_min_temp)::numeric, 4) AS r_squared,
+    ROUND(corr(avg_annual_cases_per_100k, avg_min_temp)::numeric, 4) AS correlation_coeff
+FROM avg_max_temp_vs_crashes;
 
 
 
