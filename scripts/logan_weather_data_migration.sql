@@ -686,21 +686,6 @@ JOIN cities AS c ON wc.city_id = c.city_id
 GROUP BY c.city
 ORDER BY avg_max_temp DESC;
 
-SELECT
-  c.city,
-  c.city_id,
-  cpi.census_pop_imputed,
-  cpi.year,
-  ROUND(AVG(wc.temp_max)::numeric, 1) AS avg_max_temp
-FROM cities AS c
-JOIN census_pops_imputed AS cpi ON c.fips_place = cpi.census_place_id AND c.fips_state_id = cpi.census_state_id
-JOIN weather_conditions AS wc ON wc.city_id = c.city_id
-GROUP BY c.city_id, cpi.census_pop_imputed, cpi.year
-ORDER BY avg_max_temp DESC;
-
-
-
-
 
 WITH start_year_end_year AS (
   SELECT 
@@ -728,6 +713,184 @@ LEFT JOIN incidents AS i
   AND grid.city_id = i.city_id
 GROUP BY grid.year, grid.city
 ORDER BY grid.city, grid.year;
+
+
+--================================================
+-- Views
+--================================================
+
+-- total incidents by day of week
+DROP VIEW IF EXISTS incidents_dow;
+
+CREATE OR REPLACE VIEW incidents_dow AS(
+  SELECT 
+	CASE 
+      WHEN EXTRACT('dow' FROM date) = 0 THEN 'Sunday'
+      WHEN EXTRACT('dow' FROM date) = 1 THEN 'Monday'
+      WHEN EXTRACT('dow' FROM date) = 2 THEN 'Tuseday'
+      WHEN EXTRACT('dow' FROM date) = 3 THEN 'Wednesday'
+      WHEN EXTRACT('dow' FROM date) = 4 THEN 'Thursday'
+      WHEN EXTRACT('dow' FROM date) = 5 THEN 'Friday'
+      WHEN EXTRACT('dow' FROM date) = 6 THEN 'Saturday'
+    END AS dow,
+	COUNT(case_num) AS count
+FROM incidents
+GROUP BY EXTRACT('dow' FROM date)
+ORDER BY EXTRACT('dow' FROM date)
+);
+
+SELECT *
+FROM incidents_dow;
+
+
+-- total incidents by season
+DROP VIEW IF EXISTS incidents_by_season;
+
+CREATE VIEW incidents_by_season AS
+WITH seasonal_data AS (
+  SELECT 
+    CASE 
+      WHEN EXTRACT('month' FROM date) BETWEEN 3 AND 5 THEN 'Spring'
+      WHEN EXTRACT('month' FROM date) BETWEEN 6 AND 8 THEN 'Summer'
+      WHEN EXTRACT('month' FROM date) BETWEEN 9 AND 11 THEN 'Fall'
+      ELSE 'Winter'
+    END AS season,
+    case_num
+  FROM incidents
+)
+SELECT 
+  season,
+  COUNT(case_num) AS count
+FROM seasonal_data
+GROUP BY season
+ORDER BY 
+  CASE season
+    WHEN 'Spring' THEN 1
+    WHEN 'Summer' THEN 2
+    WHEN 'Fall'   THEN 3
+    WHEN 'Winter' THEN 4
+  END;
+
+SELECT * FROM incidents_by_season;
+
+
+-- total incidents by day of week
+DROP VIEW IF EXISTS incidents_by_hour;
+
+CREATE OR REPLACE VIEW incidents_by_hour AS(
+  SELECT 
+    EXTRACT('hour' FROM time) AS hour,
+    CASE 
+      WHEN EXTRACT('hour' FROM time) BETWEEN 6 AND 11 THEN 'Morning'
+      WHEN EXTRACT('hour' FROM time) BETWEEN 12 AND 17 THEN 'Afternoon'
+      WHEN EXTRACT('hour' FROM time) BETWEEN 18 AND 21 THEN 'Evening'
+      ELSE 'Night'
+    END as day_part,
+	COUNT(case_num) AS count,
+    c.city
+FROM incidents AS i
+JOIN cities AS c ON i.city_id = c.city_id
+WHERE EXTRACT('hour' FROM time) NOTNULL
+GROUP BY hour, c.city
+ORDER BY hour
+);
+
+SELECT *
+FROM incidents_by_hour;
+
+
+-- Deadliest Cities per capita
+DROP VIEW IF EXISTS deadliest_cities_per_capita;
+
+CREATE OR REPLACE VIEW deadliest_cities_per_capita AS(
+SELECT
+  c.city, 
+  ROUND(COUNT(i.case_num) / AVG(census_pop_imputed) * 100000 / 5, 1) AS avg_annual_cases_per_100k
+FROM cities AS c
+JOIN incidents AS i ON c.city_id = i.city_id
+JOIN census_pops_imputed AS pop ON c.fips_place_id = pop.fips_place_id AND c.fips_state_id = pop.fips_state_id
+GROUP BY c.city
+ORDER BY avg_annual_cases_per_100k DESC
+LIMIT 10
+);
+
+SELECT *
+FROM deadliest_cities_per_capita;
+
+
+
+-- Incident count by city and year for heat map visualization
+
+DROP VIEW IF EXISTS incident_by_year_heatmap;
+
+CREATE OR REPLACE VIEW incident_by_year_heatmap AS(
+WITH start_year_end_year AS (
+  SELECT 
+    MIN(EXTRACT(year FROM i.date)) AS start_year,
+    MAX(EXTRACT(year FROM i.date)) AS end_year
+  FROM incidents AS i
+),
+time_table AS (
+  SELECT
+    generate_series(start_year, end_year) AS year
+  FROM start_year_end_year
+),
+year_city_grid AS (
+  SELECT
+    tt.year,
+    c.city,
+    c.city_id,
+    c.fips_place_id,
+    c.fips_state_id
+  FROM time_table tt
+  CROSS JOIN cities c
+)
+SELECT 
+  TO_DATE(grid.year::text, 'YYYY') AS time,
+  grid.city,
+  ROUND(COUNT(i.date) / pop.census_pop_imputed * 100000,1) AS incident_per_100k
+FROM year_city_grid AS grid
+LEFT JOIN incidents AS i 
+  ON grid.year = EXTRACT(year FROM i.date) 
+  AND grid.city_id = i.city_id
+JOIN census_pops_imputed AS pop ON grid.year = pop.year AND grid.fips_place_id = pop.fips_place_id AND grid.fips_state_id = pop.fips_state_id
+GROUP BY grid.year, grid.city, pop.census_pop_imputed
+ORDER BY grid.city DESC, grid.year
+);
+
+SELECT * FROM incident_by_year_heatmap;
+
+
+-- Setting up scatter plot to compare number of accidents to average percipitation by city
+
+DROP VIEW IF EXISTS annual_precip_vs_crashes;
+
+CREATE OR REPLACE VIEW annual_precip_vs_crashes AS(
+WITH daily_precip AS (
+  SELECT 
+  ROUND(AVG(w.precipitation_sum::numeric),3) *365 AS avg_annual_precip_inch,
+  w.city_id
+FROM weather_conditions AS w
+GROUP BY city_id
+)
+SELECT
+  c.city, 
+  ROUND(COUNT(i.case_num) / AVG(census_pop_imputed) * 100000 / 5, 1) AS avg_annual_cases_per_100k,
+  dp.avg_annual_precip_inch
+FROM cities AS c
+JOIN incidents AS i ON c.city_id = i.city_id
+JOIN census_pops_imputed AS pop ON c.fips_place_id = pop.fips_place_id AND c.fips_state_id = pop.fips_state_id
+JOIN daily_precip AS dp ON c.city_id = dp.city_id
+GROUP BY c.city, avg_annual_precip_inch
+ORDER BY avg_annual_cases_per_100k DESC
+);
+
+SELECT * FROM annual_precip_vs_crashes;
+
+
+
+
+
 
 
 
