@@ -1,5 +1,4 @@
 -- Author: Logan Rosell
--- connect to railway database in terminal with the following command: psql postgresql://postgres:lupJXLSDiUiKBosiMsFNyPhjuWbkkdrk@turntable.proxy.rlwy.net:31000/railway
 
 --===============================================
 -- Create State Abberivation Lookup Table
