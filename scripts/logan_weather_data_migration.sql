@@ -727,7 +727,7 @@ CREATE OR REPLACE VIEW incidents_dow AS(
 	CASE 
       WHEN EXTRACT('dow' FROM date) = 0 THEN 'Sunday'
       WHEN EXTRACT('dow' FROM date) = 1 THEN 'Monday'
-      WHEN EXTRACT('dow' FROM date) = 2 THEN 'Tuseday'
+      WHEN EXTRACT('dow' FROM date) = 2 THEN 'Tuesday'
       WHEN EXTRACT('dow' FROM date) = 3 THEN 'Wednesday'
       WHEN EXTRACT('dow' FROM date) = 4 THEN 'Thursday'
       WHEN EXTRACT('dow' FROM date) = 5 THEN 'Friday'
@@ -816,7 +816,6 @@ LIMIT 10
 
 SELECT *
 FROM deadliest_cities_per_capita;
-
 
 
 -- Incident count by city and year for heat map visualization
@@ -940,6 +939,32 @@ SELECT
     ROUND(corr(avg_annual_cases_per_100k, avg_min_temp)::numeric, 4) AS correlation_coeff
 FROM avg_max_temp_vs_crashes;
 
+
+-- regression between lattidue (north south) and number of crashes 
+DROP VIEW IF EXISTS lat_vs_crashes;
+
+CREATE OR REPLACE VIEW lat_vs_crashes AS(
+SELECT
+  COUNT(i.city_id) AS crash_count,
+  c.city, 
+  llcl.geocode_lat AS city_lat,
+  ROUND(COUNT(i.city_id) / AVG(census_pop_imputed) * 100000 / 5, 1) AS avg_annual_cases_per_100k
+FROM cities AS c
+JOIN incidents AS i ON c.city_id = i.city_id
+JOIN lat_lon_city_lookup AS llcl ON c.city_id = llcl.city_id
+JOIN census_pops_imputed AS pop ON c.fips_place_id = pop.fips_place_id AND c.fips_state_id = pop.fips_state_id
+
+GROUP BY c.city, llcl.geocode_lat
+);
+
+SELECT * FROM lat_vs_crashes;
+
+SELECT 
+    ROUND(regr_slope(avg_annual_cases_per_100k, city_lat)::numeric, 3) AS slope,
+    ROUND(regr_intercept(avg_annual_cases_per_100k, city_lat)::numeric, 1) AS intercept,
+    ROUND(regr_r2(avg_annual_cases_per_100k, city_lat)::numeric, 4) AS r_squared,
+    ROUND(corr(avg_annual_cases_per_100k, city_lat)::numeric, 4) AS correlation_coeff
+FROM lat_vs_crashes;
 
 
 
